@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniFig CI/CD — Facilitator Hub</title>
+<style>
+  :root{
+    --bg:#000000; --panel:#171c28; --ink:#f2efe4; --muted:#9aa3b8;
+    --a:#0e5fce; --gold:#ffce1f; --good:#22a559; --alert:#d4241f;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;color:var(--ink);font-family:var(--sans);}
+  body{
+    background-color:var(--bg);
+    background-image:radial-gradient(circle, #1c2230 1.6px, transparent 1.6px);
+    background-size:26px 26px;
+  }
+  .cursor{display:inline-block;width:8px;height:14px;background:var(--good);vertical-align:-2px;animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  a{color:var(--a);}
+  .layout{display:flex;min-height:100vh;}
+  nav{width:230px;flex-shrink:0;background:var(--panel);border-right:1px solid #2a3142;padding:22px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+  nav .brand{font-weight:700;font-size:15px;padding:0 10px 18px;color:var(--muted);}
+  nav .brand b{color:var(--ink);display:block;font-size:17px;}
+  nav button{display:block;width:100%;text-align:left;background:none;border:none;color:var(--muted);padding:10px 10px;border-radius:5px;font-size:14px;cursor:pointer;font-family:var(--sans);margin-bottom:2px;}
+  nav button:hover{background:#20263480;color:var(--ink);}
+  nav button.active{background:#20263480;color:var(--ink);border-left:3px solid var(--a);padding-left:7px;font-weight:600;}
+  main{flex:1;padding:40px 48px;max-width:880px;}
+  @media (max-width:800px){
+    .layout{flex-direction:column;}
+    nav{width:100%;height:auto;position:relative;display:flex;overflow-x:auto;padding:12px;gap:4px;}
+    nav .brand{display:none;}
+    nav button{white-space:nowrap;margin-bottom:0;}
+    main{padding:28px 22px;}
+  }
+  h1{font-size:28px;margin:0 0 6px;font-family:var(--mono);font-weight:800;}
+  h2{font-size:19px;margin:34px 0 12px;}
+  h2:first-of-type{margin-top:0;}
+  p.lead{color:var(--muted);line-height:1.6;max-width:620px;margin:0 0 22px;}
+  p{line-height:1.6;color:var(--ink);}
+  .section{display:none;}
+  .section.active{display:block;}
+  .card{background:var(--panel);border-radius:6px;padding:20px 22px;margin-bottom:16px;border-top:4px solid var(--muted);}
+  .card.a{border-top-color:var(--a);}
+  .card.gold{border-top-color:var(--gold);}
+  .card.good{border-top-color:var(--good);}
+  .card h3{margin:0 0 6px;font-size:16px;}
+  .card p{margin:0;color:var(--muted);font-size:14px;}
+  table{width:100%;border-collapse:collapse;margin:12px 0 22px;}
+  th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;padding:9px 10px;border-bottom:1px solid #2a3142;}
+  td{padding:11px 10px;border-bottom:1px solid #2a3142;font-size:14px;vertical-align:top;}
+  td.mono{font-family:var(--mono);color:var(--gold);white-space:nowrap;}
+  ul.check{list-style:none;padding:0;margin:0 0 22px;}
+  ul.check li{padding:9px 0 9px 30px;position:relative;border-bottom:1px solid #2a3142;font-size:14px;}
+  ul.check li::before{content:"☐";position:absolute;left:0;color:var(--muted);font-size:16px;}
+  .script-line{background:var(--panel);border-left:3px solid var(--a);padding:12px 16px;margin-bottom:10px;border-radius:0 4px 4px 0;font-size:14px;}
+  .script-line b{color:var(--gold);font-family:var(--mono);font-size:11px;display:block;margin-bottom:4px;}
+  .faq-item{margin-bottom:18px;}
+  .faq-item .q{font-weight:700;margin-bottom:5px;font-size:14.5px;}
+  .faq-item .a{color:var(--muted);font-size:14px;line-height:1.6;}
+  .link-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+  @media (max-width:600px){.link-grid{grid-template-columns:1fr;}}
+  .link-card{display:block;background:var(--panel);border-radius:6px;padding:20px;border:1px solid #2a3142;text-decoration:none;color:var(--ink);transition:transform .12s ease, border-color .12s ease;}
+  .link-card:hover{border-color:var(--a);transform:translateY(-2px);}
+  .link-card .tag{font-family:var(--mono);font-size:11px;color:var(--a);margin-bottom:6px;}
+  .link-card h3{margin:0 0 6px;font-size:16px;}
+  .link-card p{color:var(--muted);font-size:13px;margin:0;}
+  .pill{display:inline-block;background:#252c3c;color:var(--muted);font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:20px;margin-right:6px;}
+  .code-block{background:#0d0f16;border:1px solid #2a3142;border-radius:6px;padding:14px 18px;margin:0 0 18px;font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+<script>
+const SECTIONS = [
+  {id:'overview', label:'Overview'},
+  {id:'pipeline', label:'The Pipeline'},
+  {id:'runmodes', label:'Run Modes'},
+  {id:'scoring', label:'Scoring'},
+  {id:'teams', label:'Teams & Setup'},
+  {id:'concepts', label:'Concept Cheat Sheet'},
+  {id:'prep', label:'Prep Checklist'},
+  {id:'script', label:'Facilitator Script'},
+  {id:'faq', label:'Troubleshooting'},
+  {id:'links', label:'Quick Links'},
+];
+
+function renderNav(active){
+  document.getElementById('nav').innerHTML = `
+    <div class="brand">MiniFig CI/CD<b>Facilitator Hub<span class="cursor"></span></b></div>
+    ${SECTIONS.map(s=>`<button class="${s.id===active?'active':''}" onclick="show('${s.id}')">${s.label}</button>`).join('')}
+  `;
+}
+function show(id){
+  renderNav(id);
+  document.getElementById('main').innerHTML = CONTENT[id]();
+  window.scrollTo(0,0);
+}
+
+const CONTENT = {
+
+overview: () => `
+  <div style="font-family:var(--mono);font-size:12px;color:var(--good);margin-bottom:14px;">$ facilitator_hub --overview<span class="cursor"></span></div>
+  <h1>MiniFig CI/CD — Pipeline Edition</h1>
+  <p class="lead">Teams run a real three-stage delivery pipeline — Designer, Dev, Tester — building Lego minifigures to spec, catching a live production incident, and scoring on throughput, quality, and defects caught.</p>
+
+  <h2>The pitch, in one breath</h2>
+  <p>Items flow continuously through three seats: a Designer turns a creative brief into a structured spec, a Dev writes the build instructions from that spec and builds it themselves, and a Tester runs assertions against the finished figure — with the power to send it back for a fix. Seats rotate clockwise on a timer — the work itself never stops moving.</p>
+
+  <h2>Format at a glance</h2>
+  <div class="card a"><h3>Teams of 3–6 people</h3><p>One shared pipeline per team. Everyone rotates through every seat over the session.</p></div>
+  <div class="card gold"><h3>Continuous flow, not rounds</h3><p>This is a Kanban system: work items move through fixed stages whenever capacity is free, not in synced rounds.</p></div>
+  <div class="card good"><h3>Real Lego, always</h3><p>The only digital parts are the brief, the spec, the incident, the rotation timer, and the score.</p></div>
+
+  <h2>Why it works for this audience</h2>
+  <p>It's a genuine walkthrough of a software delivery pipeline, physically enacted — and it makes one point most people never get shown so concretely: code that runs exactly as written can still fail once it's live. Testing has its own job to do, separate from writing the code in the first place.</p>
+`,
+
+pipeline: () => `
+  <h1>The Pipeline</h1>
+  <p class="lead">Three seats, one flow. Cards move left to right; people rotate through the seats, not the cards.</p>
+
+  <div class="card a"><h3>1. Designer</h3><p>Reads a short creative brief (e.g. "a knight heading into battle") and chooses a value for each of the five fields, building the spec as structured data. This is the requirement, written as code — not prose.</p></div>
+  <div class="code-block">spec = {<br>&nbsp;&nbsp;head: "Helmet",<br>&nbsp;&nbsp;torso: "Grey",<br>&nbsp;&nbsp;arms: "Grey",<br>&nbsp;&nbsp;legs: "Black",<br>&nbsp;&nbsp;accessory: "Tool-shaped Item"<br>}</div>
+
+  <div class="card gold"><h3>2. Dev</h3><p>Reads the Designer's spec and hand-writes the build instructions for it, then builds exactly what they wrote, physically, with real Lego. Partway through, a live exception may hit — one field's value changes at runtime, after the code was already written.</p></div>
+  <div class="code-block">attach(legs, spec.legs)<br>attach(torso, spec.torso)<br>attach(arms, spec.arms)<br>attach(head, spec.head)<br>if spec.accessory != "None":<br>&nbsp;&nbsp;attach(accessory, spec.accessory)</div>
+
+  <div class="card good"><h3>3. Tester</h3><p>Compares the finished figure to the true final spec (incident included) and marks each of the five fields PASS or FAIL. If enough fails, the Tester can send the item back to Dev for a fix — a real reject, not just a note.</p></div>
+
+  <h2>Physical capacity</h2>
+  <p>Each team has a fixed number of minifig sets — typically 10. A built figure locks up one full set of parts until it's taken apart again, so the Team Pipeline Console tracks parts in use live and blocks starting a new build once you're out. To free a set, recycle a finished item in the Done column — this is the same constraint as limited staging environments or compute capacity in a real delivery team: you can't spin up new work indefinitely, you have to tear something down first.</p>
+
+  <h2>Virus crisis (optional escalation)</h2>
+  <p>Once per session, a team can be hit by a "virus" — every figure they've built, mid-build or already finished, is corrupted and has to be taken apart, parts and all. Crucially, <b>their score doesn't change</b>. That split is the whole point: it models a real disaster-recovery scenario, where a live incident (ransomware, a corrupted database) can wipe production and everything currently in flight — but a bank's audit trail of already-signed-off work lives on a separate system and survives untouched. That's the actual, regulatory reason financial institutions are required to maintain backups and disaster recovery plans, not just good practice.</p>
+  <p>Both tools have a checkbox to turn this on or off — it's on by default in each, but skip it entirely if it doesn't suit your room. In the Team Pipeline Console it fires once, randomly, on that team's own clock — no coordination needed. In Presentation Mode you enter the number of teams up front and it generates a schedule naming specific teams at specific moments across Item 1 and Item 2, so different teams get hit at different times.</p>
+
+  <h2>Rotation</h2>
+  <p>On a shift bell (default every 4 minutes), everyone moves one seat clockwise. Work-in-progress stays at the seat — whoever rotates in picks up wherever the last person left off. Because several items are moving through different stages at once, nobody is idle waiting for a "round" to end.</p>
+`,
+
+runmodes: () => `
+  <h1>Run Modes</h1>
+  <p class="lead">Two tools, depending on what devices you've got in the room.</p>
+
+  <div class="card a">
+    <h3>Team Pipeline Console — <span class="pill">team-pipeline-console.html</span></h3>
+    <p>One laptop per team, shared by everyone at that table. Runs the full Kanban board — cards moving through Designing, Developing, Testing — with rotation timer, live incident, and live score tracked automatically. Use this whenever each team has a laptop.</p>
+  </div>
+  <div class="card gold">
+    <h3>Presentation Mode — <span class="pill">presentation-mode.html</span></h3>
+    <p>One shared screen for the whole room. Every team works through the same stage at the same time — Designing, then Developing (with a synced incident), then Testing — cycling through as many items as time allows. Scoring is tracked on paper by each team and entered into the leaderboard slide at the end. Use this when laptops are scarce.</p>
+  </div>
+  <div class="card good">
+    <h3>Host Leaderboard — <span class="pill">host-leaderboard.html</span></h3>
+    <p>Standalone team scoreboard. Use alongside Team Pipeline Console (which doesn't do cross-team comparison itself) — log each team's score as they report in, reveal ascending for the big finish. Not needed if running Presentation Mode, which has its own leaderboard slide.</p>
+  </div>
+`,
+
+scoring: () => `
+  <h1>Scoring</h1>
+  <p class="lead">Every completed item earns a team points across three categories, added together for the team total.</p>
+  <table>
+    <tr><th>Category</th><th>When it's earned</th><th>Points</th></tr>
+    <tr><td>Throughput</td><td>An item reaches Done</td><td class="mono">+1</td></tr>
+    <tr><td>Quality</td><td>Each field the Tester marks PASS</td><td class="mono">+1 (max 5/item)</td></tr>
+    <tr><td>Defects Caught</td><td>Tester sends an item back to Dev for a fix</td><td class="mono">+1</td></tr>
+  </table>
+  <p>Team total = Throughput + Quality + Defects Caught, summed across every item the team processes. Highest team total wins.</p>
+  <p>This deliberately rewards more than speed: a team that rushes items through with no real testing scores worse on Quality and Defects Caught than one that tests properly — the same trade-off real delivery teams are measured on.</p>
+`,
+
+teams: () => `
+  <h1>Teams & Setup</h1>
+
+  <h2>Team size and seats</h2>
+  <p>3 people covers the three seats exactly. 6 people works well as two pipelines side by side within the same team, doubling throughput capacity. Odd numbers are fine — the extra person floats to whichever stage has a backlog building up.</p>
+
+  <h2>Parts budget</h2>
+  <p>Each team gets a fixed number of minifig sets — set this in the console at startup (default 10). That's a hard cap on how many items can be assembled at once; teams have to recycle a completed build in the Done column before starting a new one once they hit it.</p>
+
+  <h2>Rotation</h2>
+  <p>Default shift length is 4 minutes — adjustable in the Team Pipeline Console at setup. On the bell, everyone moves one seat clockwise; the board itself doesn't track who's sitting where, only what stage each item is in.</p>
+
+  <h2>Sorting the Lego</h2>
+  <p>Specs are generated from five generic categories — sort loose parts into labelled trays matching them:</p>
+  <table>
+    <tr><th>Category</th><th>What goes in it</th></tr>
+    <tr><td class="mono">head</td><td>Bare heads, hair pieces, hats, helmets, masks, hoods</td></tr>
+    <tr><td class="mono">torso</td><td>Torsos, grouped loosely by colour</td></tr>
+    <tr><td class="mono">arms</td><td>Arm pieces, grouped by colour — can differ from the torso</td></tr>
+    <tr><td class="mono">legs</td><td>Leg pieces, grouped by colour</td></tr>
+    <tr><td class="mono">accessory</td><td>Any handheld piece — sorted loosely by shape (long, flat, tool-shaped, round)</td></tr>
+  </table>
+  <p>Category lists — and the creative briefs Designers work from — are editable at the top of <span class="pill">team-pipeline-console.html</span> and <span class="pill">presentation-mode.html</span> if you want to tailor them.</p>
+`,
+
+concepts: () => `
+  <h1>Concept Cheat Sheet</h1>
+  <p class="lead">Every stage already shows this in-app — use this page to reinforce it verbally as you circulate the room.</p>
+  <table>
+    <tr><th>Stage</th><th>Concept</th><th>Role (incl. finance)</th></tr>
+    <tr><td class="mono">Designing</td><td>Turning a requirement into structured data — the spec someone else's code will read</td><td>Product / UX Designer — in finance, often a Business Analyst</td></tr>
+    <tr><td class="mono">Developing</td><td>Writing code from a spec and running it yourself</td><td>Software Developer / Engineer</td></tr>
+    <tr><td class="mono">Testing</td><td>Running an assertion per field, with the authority to send work back</td><td>QA / Internal Audit — in finance, Risk & Controls</td></tr>
+    <tr><td class="mono">Incident</td><td>A value changes at runtime — after the code was already written correctly</td><td>SRE / Incident Manager — in finance, Trading Systems Support</td></tr>
+    <tr><td class="mono">Rotation</td><td>Everyone understands every stage, not just their own</td><td>Cross-functional team member</td></tr>
+    <tr><td class="mono">Capacity</td><td>Limited physical parts force reuse — the same problem as limited compute or staging environments</td><td>Infrastructure / Platform Engineer — capacity planning</td></tr>
+    <tr><td class="mono">Virus crisis</td><td>Production and in-flight work can be corrupted, but an immutable audit log of completed work survives separately</td><td>Business Continuity / DR lead, Security Incident Response — a regulatory requirement in finance</td></tr>
+    <tr><td class="mono">The board</td><td>A Kanban system — continuous flow, not synced rounds</td><td>Agile / DevOps team</td></tr>
+    <tr><td class="mono">Scoring</td><td>Throughput + Quality + Defects Caught — not just speed</td><td>Engineering Manager / Delivery Lead</td></tr>
+  </table>
+`,
+
+prep: () => `
+  <h1>Prep Checklist</h1>
+  <ul class="check">
+    <li>Split and sort Lego into 5 labelled trays per table (head / torso / arms / legs / accessory)</li>
+    <li>Decide Team Pipeline Console vs Presentation Mode for your room</li>
+    <li>Test the full loop once, on the actual devices, with wifi off</li>
+    <li>Assign seats and agree rotation direction (clockwise) with each team</li>
+    <li>Set shift length to match your actual time slot</li>
+    <li>Brief facilitators circulating the room on the concept cheat sheet</li>
+    <li>Print or prep a syntax reference card for Devs if not using the console's built-in one</li>
+    <li>Have a fallback plan for a dead laptop (see Troubleshooting)</li>
+  </ul>
+`,
+
+script: () => `
+  <h1>Facilitator Script</h1>
+  <p class="lead">Suggested talking points — adapt freely.</p>
+
+  <div class="script-line"><b>WELCOME</b>You're running a real three-stage delivery pipeline — Designer, Dev, Tester — with nothing but Lego and your own logic. Watch for the constructs as you go: structured data, conditionals, exceptions, assertions.</div>
+  <div class="script-line"><b>AT THE DESIGNER SEAT</b>You're not writing prose, you're writing structured data — a spec someone else's code will read exactly as given. Every field matters.</div>
+  <div class="script-line"><b>AT THE DEV SEAT</b>Write the instructions exactly from the spec, then build exactly what you wrote. This is source code — and you're also the one running it.</div>
+  <div class="script-line"><b>WHEN THE INCIDENT FIRES</b>This just hit live, mid-build, after the code was already written correctly. This is exactly what an SRE or change manager deals with on a bad day — patch it and keep going.</div>
+  <div class="script-line"><b>AT THE TESTER SEAT</b>Run the assertion for every field — PASS or FAIL, not opinion. If it's not right, send it back. That's real gatekeeping, not just a note.</div>
+  <div class="script-line"><b>ON THE ROTATION BELL</b>Move one seat clockwise. Pick up whatever's there — the pipeline doesn't pause for you.</div>
+  <div class="script-line"><b>FINAL REVEAL</b>Every team's score is Throughput plus Quality plus Defects Caught. Let's see who comes out on top.</div>
+`,
+
+faq: () => `
+  <h1>Troubleshooting</h1>
+
+  <div class="faq-item"><div class="q">A team is upset about losing their built figures to the virus?</div><div class="a">Worth naming out loud in the moment: their score is genuinely untouched — only the physical build is lost. That distinction (safe ledger, corrupted production) is the actual lesson, not a consolation prize.</div></div>
+  <div class="faq-item"><div class="q">The console won't let a card start Developing?</div><div class="a">You're out of free parts sets. Recycle a completed build in the Done column — that's the parts-budget limit working as intended, not a bug.</div></div>
+  <div class="faq-item"><div class="q">One column is backed up while others sit empty?</div><div class="a">That's a real bottleneck — encourage people to swarm the blocked stage rather than wait at an empty one. It's a genuine delivery-team instinct worth naming out loud.</div></div>
+  <div class="faq-item"><div class="q">No sound when the incident fires?</div><div class="a">Some browsers block audio until the page has had a click. The visual banner still fires reliably — a loud verbal announcement covers the rest.</div></div>
+  <div class="faq-item"><div class="q">A laptop dies mid-session?</div><div class="a">Fall back to running that team's pipeline on paper — spec on an index card, timer on your phone — or fold them into Presentation Mode if it's projected.</div></div>
+  <div class="faq-item"><div class="q">Does this need wifi?</div><div class="a">No — both tools are fully self-contained once loaded. Test with wifi off beforehand.</div></div>
+  <div class="faq-item"><div class="q">A team's Tester sign-off seems too generous?</div><div class="a">That's deliberate — testing is trust-based, exactly like a real one. A team being loose with it is a good discussion point for the debrief, not a bug.</div></div>
+  <div class="faq-item"><div class="q">Ran out of a colour or headgear type physically?</div><div class="a">Edit the category list at the top of the file beforehand, or let the team use the closest match and mention it out loud.</div></div>
+`,
+
+links: () => `
+  <h1>Quick Links</h1>
+  <p class="lead">These open the other tools directly, assuming they're saved in the same folder as this page.</p>
+  <div class="link-grid">
+    <a class="link-card" href="team-pipeline-console.html" target="_blank">
+      <div class="tag">TOOL</div><h3>Team Pipeline Console</h3><p>Per-team Kanban board — spec, compile, build, audit, live scoring.</p>
+    </a>
+    <a class="link-card" href="presentation-mode.html" target="_blank">
+      <div class="tag">TOOL</div><h3>Presentation Mode</h3><p>One shared screen for the whole room, no laptops needed.</p>
+    </a>
+    <a class="link-card" href="host-leaderboard.html" target="_blank">
+      <div class="tag">TOOL</div><h3>Host Leaderboard</h3><p>Team scoreboard for use alongside the Pipeline Console.</p>
+    </a>
+    <a class="link-card" href="#" onclick="show('overview'); return false;">
+      <div class="tag">HUB</div><h3>Back to Overview</h3><p>Return to the start of this hub.</p>
+    </a>
+  </div>
+`,
+
+};
+
+show('overview');
+</script>
+</body>
+</html>

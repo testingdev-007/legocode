@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniFig CI/CD — Executive Summary</title>
+<style>
+  :root{
+    --bg:#000000; --panel:#171c28; --ink:#f2efe4; --muted:#9aa3b8;
+    --a:#0e5fce; --gold:#ffce1f; --good:#22a559; --alert:#d4241f; --violet:#9b7ef0;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;color:var(--ink);font-family:var(--sans);}
+  body{
+    background-color:var(--bg);
+    background-image:radial-gradient(circle, #1c2230 1.6px, transparent 1.6px);
+    background-size:26px 26px;
+  }
+  .cursor{display:inline-block;width:8px;height:14px;background:var(--good);vertical-align:-2px;animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .wrap{max-width:760px;margin:0 auto;padding:56px 26px 90px;}
+  .terminal{font-family:var(--mono);font-size:12px;color:var(--good);background:#05070c;border:1px solid #262d3d;border-radius:8px;padding:10px 16px;margin-bottom:26px;display:inline-block;}
+  h1{font-family:var(--mono);font-weight:800;font-size:clamp(28px,4.5vw,42px);margin:0 0 10px;line-height:1.1;}
+  h1 .slash{color:var(--gold);}
+  p.lead{color:var(--muted);font-size:16px;line-height:1.6;margin:0 0 36px;}
+  h2{font-size:16px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-family:var(--mono);margin:38px 0 12px;}
+  p, li{line-height:1.65;font-size:15px;}
+  ul{padding-left:20px;margin:0;}
+  li{margin-bottom:6px;}
+
+  .stat-strip{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:6px;}
+  .stat-chip{background:var(--panel);border:1px solid #262d3d;border-radius:8px;padding:14px 18px;flex:1;min-width:130px;}
+  .stat-chip .num{font-family:var(--mono);font-weight:800;font-size:24px;}
+  .stat-chip .lbl{font-size:12px;color:var(--muted);margin-top:4px;}
+  .stat-chip.a .num{color:var(--a);} .stat-chip.gold .num{color:var(--gold);}
+  .stat-chip.good .num{color:var(--good);} .stat-chip.violet .num{color:var(--violet);}
+
+  table{width:100%;border-collapse:collapse;margin:6px 0 10px;}
+  th{text-align:left;font-size:12px;color:var(--muted);font-weight:600;padding:9px 10px;border-bottom:1px solid #262d3d;}
+  td{padding:10px 10px;border-bottom:1px solid #262d3d;font-size:14px;vertical-align:top;}
+  td.mono{font-family:var(--mono);color:var(--gold);white-space:nowrap;}
+
+  .quote-block{background:var(--panel);border-left:4px solid var(--good);border-radius:6px;padding:16px 20px;margin:10px 0 6px;font-size:14.5px;color:var(--muted);}
+  footer{margin-top:50px;font-family:var(--mono);color:var(--muted);font-size:12px;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="terminal">$ generate --exec-summary<span class="cursor"></span></div>
+
+  <h1>MiniFig CI<span class="slash">/</span>CD — Executive Summary</h1>
+  <p class="lead">A live, hands-on activity that turns a real software delivery pipeline into a game — built out of Lego, run in under an hour, and designed for a Women in Tech audience with a financial-services lens.</p>
+
+  <div class="stat-strip">
+    <div class="stat-chip a"><div class="num">3</div><div class="lbl">roles per team</div></div>
+    <div class="stat-chip gold"><div class="num">30–40</div><div class="lbl">minutes to run</div></div>
+    <div class="stat-chip good"><div class="num">3–6</div><div class="lbl">people per team</div></div>
+    <div class="stat-chip violet"><div class="num">0</div><div class="lbl">coding experience required</div></div>
+  </div>
+
+  <h2>What it is</h2>
+  <p>Teams run their own three-stage delivery pipeline — <b>Designer → Dev → Tester</b> — building Lego minifigures to a spec instead of shipping software. A Designer turns a short brief into structured requirements, a Dev writes build instructions and builds them, and a Tester checks the result and can send it back for a fix. Partway through, a live "production incident" changes the spec mid-build — a concrete, physical demonstration that passing review doesn't guarantee nothing goes wrong at runtime.</p>
+
+  <h2>Why it works</h2>
+  <ul>
+    <li><b>No prior coding knowledge needed</b> — every construct (variables, conditionals, exceptions, assertions) is taught through a physical action, not a screen.</li>
+    <li><b>Every stage maps to a real job</b>, explicitly, including financial-services-specific roles (Business Analyst, Risk & Controls, Trading Systems Support) — giving attendees a concrete "this could be me" moment.</li>
+    <li><b>Continuous flow, not scripted rounds</b> — the pipeline runs as a real Kanban system, so nobody sits idle waiting for a turn.</li>
+    <li><b>Competitive without being exclusionary</b> — teams score on throughput, quality, and defects caught, not just speed, rewarding careful work as much as fast work.</li>
+    <li><b>An optional escalation with real teeth</b> — a toggleable "virus" crisis can wipe a team's entire physical build, mid-work or already finished, while their score stays untouched — a live, physical lesson in why disaster recovery and immutable audit logs are a regulatory requirement in finance, not a nice-to-have.</li>
+  </ul>
+
+  <h2>Format at a glance</h2>
+  <table>
+    <tr><th>Element</th><th>Detail</th></tr>
+    <tr><td class="mono">Team size</td><td>3–6 people; scales to more via a second pipeline per team</td></tr>
+    <tr><td class="mono">Duration</td><td>30–40 minutes, including a live leaderboard reveal</td></tr>
+    <tr><td class="mono">Materials</td><td>10 loose Lego minifigure sets per team, split into 5 generic part categories</td></tr>
+    <tr><td class="mono">Tech needed</td><td>One laptop per team, or a single shared screen — no wifi required</td></tr>
+    <tr><td class="mono">Facilitation</td><td>One host running the room; scripted talking points provided</td></tr>
+  </table>
+
+  <h2>What attendees take away</h2>
+  <p>A working mental model of an actual software delivery pipeline — requirements, build, review, release, and the fact that testing exists because things go wrong even when code is written correctly. Delivered physically and competitively, with a live scoring reveal, rather than lectured.</p>
+
+  <div class="quote-block">"You just ran: turn a requirement into data → write and run code → test it — the same loop that repeats every sprint in a real delivery team."</div>
+
+  <h2>Supporting tools</h2>
+  <p>Four companion tools run the day: a per-team pipeline console, a whole-room presentation mode for when laptops are scarce, a host leaderboard, and a facilitator hub covering setup, scoring, and troubleshooting. All are self-contained, offline-safe web pages — no installation, no account, no cost beyond the Lego itself.</p>
+
+  <footer>zero dependencies · zero wifi · zero budget beyond Lego you already have</footer>
+</div>
+</body>
+</html>

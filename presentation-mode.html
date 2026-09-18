@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniFig CI/CD — Presentation Mode</title>
+<style>
+  :root{
+    --bg:#000000; --panel:#171c28; --ink:#f2efe4; --muted:#9aa3b8;
+    --a:#0e5fce; --alert:#d4241f; --good:#22a559; --gold:#ffce1f;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;overflow:hidden;color:var(--ink);font-family:var(--sans);}
+  body{
+    background-color:var(--bg);
+    background-image:radial-gradient(circle, #1c2230 1.6px, transparent 1.6px);
+    background-size:26px 26px;
+  }
+  .cursor{display:inline-block;width:8px;height:14px;background:var(--good);vertical-align:-2px;animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  #app{height:100%;display:flex;flex-direction:column;}
+  .slide{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;text-align:center;}
+  .eyebrow{font-family:var(--mono);color:var(--muted);font-size:16px;margin-bottom:18px;}
+  h1{font-size:clamp(34px,5vw,64px);margin:0 0 20px;max-width:900px;font-family:var(--mono);font-weight:800;letter-spacing:-.01em;}
+  p.lead{font-size:clamp(16px,2vw,22px);color:var(--muted);max-width:720px;line-height:1.5;margin:0 0 26px;}
+  .code-block{background:#0d0f16;border:1px solid #2a3142;border-radius:8px;padding:20px 26px;margin:0 auto 26px;font-family:var(--mono);font-size:clamp(14px,1.8vw,20px);line-height:1.8;text-align:left;max-width:600px;}
+  .code-block .str{color:var(--gold);}
+  .code-line{padding-left:16px;}
+  .code-line.changed{color:var(--alert);}
+  .timer-big{font-family:var(--mono);font-size:clamp(60px,12vw,140px);font-weight:800;line-height:1;}
+  .timer-big.low{color:var(--alert);}
+  .controls{display:flex;gap:12px;padding:16px;justify-content:center;border-top:1px solid #2a3142;background:var(--panel);}
+  .btn{padding:11px 22px;border-radius:6px;border:none;font-weight:700;font-size:15px;cursor:pointer;font-family:var(--sans);background:var(--a);color:#fff;box-shadow:0 4px 0 rgba(0,0,0,.35);transition:transform .1s ease, box-shadow .1s ease;}
+  .btn:hover{transform:translateY(1px);box-shadow:0 3px 0 rgba(0,0,0,.35);}
+  .btn:active{transform:translateY(4px);box-shadow:none;}
+  .btn.ghost{background:transparent;border:1px solid #333c50;color:var(--ink);box-shadow:none;}
+  .progress{font-family:var(--mono);font-size:12px;color:var(--muted);align-self:center;margin-right:auto;padding-left:6px;}
+  .banner{position:fixed;inset:0;background:rgba(255,206,31,.97);z-index:50;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px;color:#141821;}
+  .banner.incident-b{background:rgba(212,36,31,.97);color:#fff;}
+  .banner h1{font-size:clamp(38px,6.5vw,70px);margin:0 0 18px;color:inherit;}
+  .banner .btn{background:#141821;color:#fff;margin-top:18px;}
+  .lb-row{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;justify-content:center;}
+  input[type=text],input[type=number]{padding:12px 14px;background:#0f1219;border:1px solid #333c50;border-radius:6px;color:var(--ink);font-family:var(--mono);font-size:15px;}
+  table{width:100%;max-width:600px;border-collapse:collapse;margin-top:10px;}
+  th{text-align:left;font-size:12px;color:var(--muted);padding:8px 10px;border-bottom:1px solid #2a3142;}
+  td{padding:12px 10px;border-bottom:1px solid #2a3142;font-family:var(--mono);text-align:left;}
+  .badge{font-size:11px;background:var(--gold);color:#141821;padding:2px 8px;border-radius:20px;margin-left:8px;}
+  .concept-box{background:#161b26;border:1px solid #2a3142;border-left:4px solid var(--good);border-radius:8px;padding:16px 22px;margin:0 auto 26px;max-width:720px;text-align:left;font-size:15px;line-height:1.5;}
+  .stage-pill{display:inline-block;font-family:var(--mono);font-size:13px;background:#252c3c;color:var(--muted);padding:5px 14px;border-radius:20px;margin-bottom:16px;}
+  .studrow-deco{display:flex;gap:6px;justify-content:center;margin-bottom:14px;}
+  .studrow-deco span{width:10px;height:10px;border-radius:50%;box-shadow:inset 0 -2px 2px rgba(0,0,0,.25);}
+  .brief-line{font-style:italic;color:var(--muted);margin-bottom:18px;font-size:16px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const HEADGEAR = ["Bare Head","Hair","Hat","Helmet","Mask","Hood"];
+const TORSO_COLORS = ["Red","Blue","Green","Yellow","Black","White","Grey","Orange"];
+const ARM_COLORS = ["Red","Blue","Green","Yellow","Black","White","Grey","Orange"];
+const LEG_COLORS = ["Red","Blue","Green","Yellow","Black","White","Grey","Orange"];
+const ACCESSORY_TYPES = ["None","Long Item","Flat Item","Tool-shaped Item","Round Item"];
+const ATTRS = [
+  {key:'head', pool:HEADGEAR}, {key:'torso', pool:TORSO_COLORS}, {key:'arms', pool:ARM_COLORS},
+  {key:'legs', pool:LEG_COLORS}, {key:'accessory', pool:ACCESSORY_TYPES},
+];
+const BRIEFS = [
+  "A knight heading into battle","A scientist late for a conference","An astronaut about to launch",
+  "A chef entering a competition","A detective on a stakeout","A gardener before a storm",
+  "A pirate at low tide","A robot fresh off the assembly line","An explorer lost in the fog","A wizard between spells"
+];
+function rand(pool){ return Math.floor(Math.random()*pool.length); }
+function genSpec(){ return {head:rand(HEADGEAR), torso:rand(TORSO_COLORS), arms:rand(ARM_COLORS), legs:rand(LEG_COLORS), accessory:rand(ACCESSORY_TYPES)}; }
+function specValue(spec,key){ return ATTRS.find(a=>a.key===key).pool[spec[key]]; }
+function fmt(s){ const m=Math.floor(s/60), sec=s%60; return m+":"+String(sec).padStart(2,'0'); }
+
+const STAGES = ['welcome','designing','developing','testing','leaderboard'];
+let idx = 0, item = 0;
+let spec = null, incidentAttr = null, brief = null;
+let designSeconds = 90, devSeconds = 150, testSeconds = 90;
+let remaining = 0, timerId = null;
+let teams = [];
+let virusSchedule = [];
+
+function mount(html){ document.getElementById('app').innerHTML = `<div class="slide">${html}</div>${controls()}`; }
+function controls(){
+  return `<div class="controls">
+    <span class="progress">Item ${item} · Stage ${idx+1}/${STAGES.length}</span>
+    <button class="btn ghost" onclick="prevStage()">◀ Back</button>
+    <button class="btn ghost" onclick="nextStage()">Next ▶</button>
+  </div>`;
+}
+function nextStage(){ clearInterval(timerId); if (idx < STAGES.length-1){ idx++; render(); } }
+function prevStage(){ clearInterval(timerId); if (idx > 0){ idx--; render(); } }
+function nextItem(){ item++; idx = 1; render(); }
+document.addEventListener('keydown', e=>{ if(e.key==='ArrowRight') nextStage(); if(e.key==='ArrowLeft') prevStage(); });
+
+function render(){
+  const s = STAGES[idx];
+  if (s==='welcome') return renderWelcome();
+  if (s==='designing') return renderStage('designing');
+  if (s==='developing') return renderStage('developing');
+  if (s==='testing') return renderStage('testing');
+  if (s==='leaderboard') return renderLeaderboard();
+}
+
+function renderWelcome(){
+  mount(`
+    <div class="eyebrow">MiniFig CI/CD — Pipeline Edition<span class="cursor"></span></div>
+    <h1>Designer. Dev. Tester.</h1>
+    <p class="lead">Every team runs its own three-stage pipeline with real Lego. Rotate seats clockwise on the bell — the pipeline doesn't care who's sitting where, only that the work keeps moving.</p>
+    <div class="concept-box">This whole room is a Kanban system: work flows through fixed stages continuously, not in synced rounds. Teams score on Throughput (items finished), Quality (fields that pass testing), and Defects Caught (Tester send-backs) — added together for the team total.</div>
+    <div class="lb-row">
+      <input type="number" id="teamCount" placeholder="Number of teams" value="4" style="max-width:180px;">
+      <input type="text" id="teamNames" placeholder="Team names, comma-separated (optional)" style="min-width:280px;">
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;justify-content:center;font-size:14px;color:var(--muted);margin-bottom:18px;">
+      <input type="checkbox" id="virusEnabled" checked style="width:auto;">
+      Enable virus crisis (random team wipes across Items 1–2)
+    </label>
+    <p style="font-size:13px;color:var(--muted);max-width:520px;margin-bottom:20px;">If enabled, a random virus crisis will hit some teams during Item 1's build, and the rest during Item 2's. If your team's name is called, take everything you've built apart immediately — even finished figures. Your score stays safe.</p>
+    <button class="btn" onclick="generateScheduleAndStart()">Generate schedule & start Item 1</button>
+  `);
+}
+function generateScheduleAndStart(){
+  const virusOn = document.getElementById('virusEnabled').checked;
+  if (!virusOn){ virusSchedule = []; nextItem(); return; }
+  const count = parseInt(document.getElementById('teamCount').value) || 4;
+  const namesRaw = document.getElementById('teamNames').value.trim();
+  const names = namesRaw ? namesRaw.split(',').map(s=>s.trim()).filter(Boolean) : [];
+  const roster = [];
+  for (let i=0;i<count;i++) roster.push(names[i] || `Team ${i+1}`);
+  // shuffle
+  for (let i=roster.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [roster[i],roster[j]]=[roster[j],roster[i]]; }
+  virusSchedule = roster.map((name,i) => ({
+    team: name,
+    item: i % 2 === 0 ? 1 : 2,
+    atSecond: 15 + Math.floor(Math.random()*(devSeconds-25)),
+    fired: false,
+  }));
+  nextItem();
+}
+
+const STAGE_INFO = {
+  designing: {title:"DESIGNING", pill:"Designer — turn the brief into a spec", lead:"Read the brief below and choose a value for each field to build your spec — you're writing structured data, not prose.", seconds:()=>designSeconds, concept:"Turning a requirement into structured data — the config someone else's code will read.", role:"Product / UX Designer — in finance, often a Business Analyst defining structured requirements.", color:"var(--a)"},
+  developing: {title:"DEVELOPING", pill:"Dev — write the code and build it", lead:"Read the spec below and hand-write the build instructions for it, then build exactly what you wrote. Watch for a live exception mid-build.", seconds:()=>devSeconds, concept:"Writing code from a spec and running it yourself — same person, write and execute.", role:"Software Developer / Engineer.", color:"var(--gold)"},
+  testing: {title:"TESTING", pill:"Tester — the final sign-off", lead:"Compare the finished figure to the true spec below (incident included) and mark each field PASS or FAIL. Testers can send work back for a fix.", seconds:()=>testSeconds, concept:"Testing runs assertions against the real result — and has the authority to send it back.", role:"QA / Internal Audit — in finance, Risk & Controls.", color:"var(--good)"},
+};
+
+function renderStage(stageKey){
+  const info = STAGE_INFO[stageKey];
+  if (stageKey==='designing'){ spec = genSpec(); incidentAttr = null; brief = BRIEFS[rand(BRIEFS)]; }
+  const lines = ATTRS.map(a=>{
+    const changed = incidentAttr===a.key && (stageKey==='developing'||stageKey==='testing');
+    return `<div class="code-line ${changed?'changed':''}">${a.key}: <span class="str">"${specValue(spec,a.key)}"</span>${changed?' ⚠ PATCHED':''}</div>`;
+  }).join('');
+  remaining = info.seconds();
+  mount(`
+    <div class="eyebrow">Item ${item} · ${info.title}</div>
+    <div class="studrow-deco"><span style="background:${info.color}"></span><span style="background:${info.color}"></span><span style="background:${info.color}"></span><span style="background:${info.color}"></span></div>
+    <div class="stage-pill">${info.pill}</div>
+    ${stageKey==='designing' ? `<div class="brief-line">"${brief}"</div><div style="color:var(--muted);font-size:13px;margin-bottom:10px;">With only 10 minifig sets per team, take apart your last build before starting this one if you're out of free parts.</div>` : ''}
+    <p class="lead">${info.lead}</p>
+    <div class="code-block">${lines}</div>
+    <div class="timer-big" id="timerDisplay">${fmt(remaining)}</div>
+    <div class="concept-box"><b>Concept:</b> ${info.concept}<br><b>Role:</b> ${info.role}</div>
+  `);
+  timerId = setInterval(()=>{
+    remaining--;
+    if (stageKey==='developing' && !incidentAttr && remaining === Math.floor(info.seconds()/2)){
+      triggerIncident();
+    }
+    if (stageKey==='developing'){
+      const elapsed = info.seconds() - remaining;
+      virusSchedule.filter(v => v.item===item && !v.fired && elapsed >= v.atSecond).forEach(v => fireVirus(v));
+    }
+    const el = document.getElementById('timerDisplay');
+    if (el){ el.textContent = fmt(remaining); el.className='timer-big'+(remaining<=15?' low':''); }
+    if (remaining<=0) clearInterval(timerId);
+  },1000);
+}
+function fireVirus(v){
+  v.fired = true;
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination); o.type='sawtooth'; g.gain.value=0.05;
+    o.frequency.value=200; o.start();
+    setTimeout(()=>{o.frequency.value=90;},250);
+    setTimeout(()=>{o.stop(); ctx.close();},700);
+  }catch(e){}
+  const el = document.createElement('div');
+  el.className = 'banner incident-b';
+  el.innerHTML = `
+    <h2>🦠 VIRUS: ${v.team}</h2>
+    <p>If that's you — take everything you've built apart right now, mid-build or already finished. Whatever you've already scored on paper stays scored.</p>
+    <p style="font-size:13px;opacity:.9;max-width:440px;">This models a real disaster-recovery scenario: a live incident can corrupt production and everything in flight, but a bank's audit trail of already-signed-off work survives on a separate system. That's why DR and backups are a regulatory requirement in finance.<br><b>Role:</b> Business Continuity / Disaster Recovery lead, Security Incident Response.</p>
+    <button class="btn" onclick="this.parentElement.remove()">Got it</button>
+  `;
+  document.body.appendChild(el);
+}
+function triggerIncident(){
+  const attr = ATTRS[rand(ATTRS)];
+  let newIdx = rand(attr.pool);
+  while (newIdx === spec[attr.key]) newIdx = rand(attr.pool);
+  spec[attr.key] = newIdx;
+  incidentAttr = attr.key;
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination); o.type='square'; g.gain.value=0.05;
+    o.frequency.value=880; o.start();
+    setTimeout(()=>{o.frequency.value=440;},180);
+    setTimeout(()=>{o.stop(); ctx.close();},420);
+  }catch(e){}
+  const el = document.createElement('div');
+  el.className = 'banner incident-b';
+  el.innerHTML = `<div class="eyebrow" style="color:#fff">⚠ EXCEPTION AT RUNTIME</div>
+    <h1>${attr.key} = "${specValue(spec, attr.key)}"</h1>
+    <p>A live incident just mutated this field mid-build. Devs: patch your build before time runs out.</p>
+    <button class="btn" onclick="this.parentElement.remove()">Got it</button>`;
+  document.body.appendChild(el);
+}
+
+function renderLeaderboard(){
+  mount(`
+    <div class="eyebrow">Final</div>
+    <h1>Leaderboard</h1>
+    <p class="lead">Each team totals its own Throughput + Quality + Defects Caught score on paper across every item — log the final number per team here. Highest total wins.</p>
+    <div class="lb-row">
+      <input type="text" id="tName" placeholder="Team name">
+      <input type="number" id="tScore" placeholder="Total score">
+      <button class="btn" onclick="addTeam()">Add</button>
+    </div>
+    <table><thead><tr><th>Rank</th><th>Team</th><th>Score</th></tr></thead><tbody id="lbBody"></tbody></table>
+    <div style="margin-top:20px"><button class="btn ghost" onclick="nextItem()">Run another item ▶</button></div>
+  `);
+  renderLbTable();
+}
+function addTeam(){
+  const name = document.getElementById('tName').value.trim();
+  const score = parseInt(document.getElementById('tScore').value);
+  if (!name || isNaN(score)) return;
+  teams.push({name,score});
+  document.getElementById('tName').value=''; document.getElementById('tScore').value='';
+  renderLbTable();
+}
+function renderLbTable(){
+  const sorted = [...teams].sort((a,b)=>b.score-a.score);
+  document.getElementById('lbBody').innerHTML = sorted.map((t,i)=>`<tr><td>${i+1}</td><td>${t.name}${i===0?'<span class="badge">Leading</span>':''}</td><td>${t.score}</td></tr>`).join('');
+}
+
+render();
+</script>
+</body>
+</html>

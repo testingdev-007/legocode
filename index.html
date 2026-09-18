@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniFig CI/CD</title>
+<style>
+  :root{
+    --bg:#000000;
+    --ink:#f2efe4; --muted:#9aa3b8;
+    --lego-red:#d4241f; --lego-blue:#0e5fce; --lego-yellow:#ffce1f; --lego-green:#22a559; --lego-violet:#8c5fe0;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;min-height:100%;}
+  body{
+    background-color:var(--bg);
+    background-image:radial-gradient(circle, #1c2230 1.6px, transparent 1.6px);
+    background-size:26px 26px;
+    color:var(--ink);font-family:var(--sans);
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:64px 26px 90px;}
+
+  .terminal{
+    font-family:var(--mono);font-size:13px;color:var(--lego-green);background:#05070c;
+    border:1px solid #1c2230;border-radius:8px;padding:14px 18px;margin-bottom:34px;
+    max-width:520px;
+  }
+  .terminal .dim{color:var(--muted);}
+  .cursor{display:inline-block;width:8px;height:15px;background:var(--lego-green);vertical-align:-2px;
+    animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+
+  h1{
+    font-family:var(--mono);font-weight:800;font-size:clamp(34px,6vw,58px);
+    margin:0 0 16px;line-height:1.05;letter-spacing:-.01em;
+  }
+  h1 .slash{color:var(--lego-yellow);}
+  p.lead{color:var(--muted);font-size:17px;line-height:1.6;max-width:600px;margin:0 0 54px;}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+  @media (max-width:720px){.grid{grid-template-columns:1fr;}}
+
+  .brick{
+    position:relative;text-decoration:none;display:block;
+    border-radius:10px;padding:34px 24px 22px;
+    color:#0d0f16;
+    box-shadow:0 10px 0 rgba(0,0,0,.35), 0 14px 24px rgba(0,0,0,.4);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .brick:hover{transform:translateY(3px);box-shadow:0 7px 0 rgba(0,0,0,.35), 0 10px 18px rgba(0,0,0,.4);}
+  .brick:active{transform:translateY(9px);box-shadow:0 1px 0 rgba(0,0,0,.35);}
+
+  .brick.red{background:linear-gradient(160deg,#e5453f,var(--lego-red) 55%);}
+  .brick.blue{background:linear-gradient(160deg,#3a86e8,var(--lego-blue) 55%);}
+  .brick.yellow{background:linear-gradient(160deg,#ffe066,var(--lego-yellow) 55%);}
+  .brick.green{background:linear-gradient(160deg,#4fd482,var(--lego-green) 55%);}
+  .brick.violet{background:linear-gradient(160deg,#b79bf5,var(--lego-violet) 55%);}
+
+  .studs{position:absolute;top:-13px;left:22px;right:22px;display:flex;justify-content:space-between;}
+  .stud{
+    width:26px;height:26px;border-radius:50%;
+    box-shadow:inset 0 -3px 4px rgba(0,0,0,.25), inset 0 3px 3px rgba(255,255,255,.35), 0 2px 3px rgba(0,0,0,.3);
+  }
+  .brick.red .stud{background:linear-gradient(160deg,#e5453f,var(--lego-red));}
+  .brick.blue .stud{background:linear-gradient(160deg,#3a86e8,var(--lego-blue));}
+  .brick.yellow .stud{background:linear-gradient(160deg,#ffe066,var(--lego-yellow));}
+  .brick.green .stud{background:linear-gradient(160deg,#4fd482,var(--lego-green));}
+  .brick.violet .stud{background:linear-gradient(160deg,#b79bf5,var(--lego-violet));}
+
+  .tag{font-family:var(--mono);font-size:11px;font-weight:700;opacity:.65;margin-bottom:8px;letter-spacing:.04em;}
+  .brick h3{margin:0 0 8px;font-size:21px;font-weight:800;}
+  .brick p{margin:0 0 16px;font-size:14px;line-height:1.55;opacity:.85;}
+  .snippet{
+    font-family:var(--mono);font-size:11.5px;background:rgba(13,15,22,.82);color:#c9f7d6;
+    border-radius:6px;padding:9px 12px;margin-bottom:14px;line-height:1.5;
+  }
+  .go{font-family:var(--mono);font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;}
+  .go::after{content:"›";font-size:17px;transition:transform .12s ease;}
+  .brick:hover .go::after{transform:translateX(4px);}
+
+  footer{margin-top:50px;font-family:var(--mono);color:var(--muted);font-size:12px;text-align:center;}
+  footer .cursor{width:6px;height:12px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="terminal">
+    <span class="dim">$</span> initializing minifig_cicd... <span class="dim">done</span><br>
+    <span class="dim">$</span> 5 modules ready<span class="cursor"></span>
+  </div>
+
+  <h1>MiniFig CI<span class="slash">/</span>CD</h1>
+  <p class="lead">Designer, Dev, Tester — a real delivery pipeline, built out of Lego. Pick your module.</p>
+
+  <div class="grid">
+    <a class="brick blue" href="team-pipeline-console.html">
+      <div class="studs"><div class="stud"></div><div class="stud"></div><div class="stud"></div><div class="stud"></div></div>
+      <div class="tag">MODULE 01 · PER TEAM</div>
+      <h3>Team Pipeline Console</h3>
+      <p>The live Kanban board driving one team's pipeline end to end.</p>
+      <div class="snippet">stage: designing → developing → testing</div>
+      <div class="go">RUN</div>
+    </a>
+
+    <a class="brick yellow" href="presentation-mode.html">
+      <div class="studs"><div class="stud"></div><div class="stud"></div><div class="stud"></div><div class="stud"></div></div>
+      <div class="tag">MODULE 02 · WHOLE ROOM</div>
+      <h3>Presentation Mode</h3>
+      <p>One shared screen, no laptops — the whole room moves together.</p>
+      <div class="snippet">broadcast(stage) → all_teams</div>
+      <div class="go">RUN</div>
+    </a>
+
+    <a class="brick green" href="host-leaderboard.html">
+      <div class="studs"><div class="stud"></div><div class="stud"></div><div class="stud"></div><div class="stud"></div></div>
+      <div class="tag">MODULE 03 · SCOREKEEPING</div>
+      <h3>Host Leaderboard</h3>
+      <p>Log points as teams report in. Reveal ascending for the finish.</p>
+      <div class="snippet">sort(teams, by: total).reveal()</div>
+      <div class="go">RUN</div>
+    </a>
+
+    <a class="brick red" href="facilitator-hub.html">
+      <div class="studs"><div class="stud"></div><div class="stud"></div><div class="stud"></div><div class="stud"></div></div>
+      <div class="tag">MODULE 04 · DOCS</div>
+      <h3>Facilitator Hub</h3>
+      <p>The pipeline explained, prep checklist, script, troubleshooting.</p>
+      <div class="snippet">read(docs) before: event_day</div>
+      <div class="go">RUN</div>
+    </a>
+
+    <a class="brick violet" href="exec-summary.html">
+      <div class="studs"><div class="stud"></div><div class="stud"></div><div class="stud"></div><div class="stud"></div></div>
+      <div class="tag">MODULE 05 · OVERVIEW</div>
+      <h3>Executive Summary</h3>
+      <p>The one-pager — what it is, why it works, format at a glance.</p>
+      <div class="snippet">summarize(activity) → stakeholders</div>
+      <div class="go">RUN</div>
+    </a>
+  </div>
+
+  <footer>self-contained · no build step · no wifi required<span class="cursor"></span></footer>
+</div>
+</body>
+</html>
